@@ -25,7 +25,7 @@ const MATCHUPS_DATA = [
   { id: 'd2_m2', day: 'Day 2', title: 'K-Ram vs. 3rdy', battlers: ['K-Ram', '3rdy'] },
   { id: 'd2_m3', day: 'Day 2', title: 'Slockone vs. Yuniko', battlers: ['Slockone', 'Yuniko'] },
   { id: 'd2_m4', day: 'Day 2', title: 'Surhenyo vs. Mastafeat', battlers: ['Surhenyo', 'Mastafeat'] },
-  { id: 'd2_m5', day: 'Day 2', title: 'Butzen vs. Steven', battlers: ['Butzen', 'Steven'] },
+  { id: 'd2_m5', day: 'Day 2', title: 'Blitzen vs. Steven', battlers: ['Blitzen', 'Steven'] },
   { id: 'd2_m6', day: 'Day 2', title: 'Sayadd vs. Zaki', battlers: ['Sayadd', 'Zaki'] },
   { id: 'd2_m7', day: 'Day 2', title: 'Mzhayt vs. Diddle', battlers: ['Mzhayt', 'Diddle'] },
   { id: 'd2_m8', day: 'Day 2', title: 'Poison13 vs. Keelan', battlers: ['Poison13', 'Keelan'] },
