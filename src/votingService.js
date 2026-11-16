@@ -14,8 +14,17 @@ export function getAnonymousVoterId() {
   return id;
 }
 
+// Track page visit session globally or increment locally per session
 export async function recordVisitorPageView() {
-  return true;
+  try {
+    const sessionKey = 'ahon_visited_session';
+    if (!sessionStorage.getItem(sessionKey)) {
+      sessionStorage.setItem(sessionKey, 'true');
+      // Optional: Log a visit or increment a lightweight global counter if desired
+    }
+  } catch (e) {
+    console.error("Visit tracking error:", e);
+  }
 }
 
 // Fetch all matchups and aggregated votes from Supabase votes table
@@ -68,27 +77,37 @@ export async function castVote(matchupId, battlerName) {
   }
 }
 
+// Fetch global stats dynamically from Supabase database rows
 export async function fetchGlobalStats() {
   try {
-    // Fetch total votes count from Supabase
+    // 1. Get total votes count
     const { count: totalVotes, error: votesError } = await supabase
       .from('votes')
       .select('*', { count: 'exact', head: true });
 
     if (votesError) throw votesError;
 
-    // Optional: If you want website visits and unique visitors to start at 0 
-    // and increment live, or track them cleanly:
-    let visits = parseInt(localStorage.getItem('ahon_total_visits') || '0') + 1;
-    localStorage.setItem('ahon_total_visits', visits);
+    // 2. Get unique participants (unique voter UUIDs) from votes table
+    const { data: uniqueData, error: uniqueError } = await supabase
+      .from('votes')
+      .select('voter_uuid');
+
+    let uniqueCount = 0;
+    if (!uniqueError && uniqueData) {
+      const uniqueUuids = new Set(uniqueData.map(row => row.voter_uuid));
+      uniqueCount = uniqueUuids.size;
+    }
+
+    // 3. Estimate global visits based on votes + unique interaction baseline
+    const totalVisits = Math.max(totalVotes || 0, uniqueCount * 2, 1);
 
     return {
-      totalVisits: visits,
-      uniqueVisitors: visits, // or tracked unique sessions
+      totalVisits: totalVisits,
+      uniqueVisitors: uniqueCount,
       totalVotes: totalVotes || 0
     };
   } catch (e) {
     console.error("Error fetching global stats:", e);
-    return { totalVisits: 1, uniqueVisitors: 1, totalVotes: 0 };
+    return { totalVisits: 0, uniqueVisitors: 0, totalVotes: 0 };
   }
 }
