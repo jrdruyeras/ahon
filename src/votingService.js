@@ -70,13 +70,25 @@ export async function castVote(matchupId, battlerName) {
 
 export async function fetchGlobalStats() {
   try {
-    const { count: totalVotes } = await supabase.from('votes').select('*', { count: 'exact', head: true });
+    // Fetch total votes count from Supabase
+    const { count: totalVotes, error: votesError } = await supabase
+      .from('votes')
+      .select('*', { count: 'exact', head: true });
+
+    if (votesError) throw votesError;
+
+    // Optional: If you want website visits and unique visitors to start at 0 
+    // and increment live, or track them cleanly:
+    let visits = parseInt(localStorage.getItem('ahon_total_visits') || '0') + 1;
+    localStorage.setItem('ahon_total_visits', visits);
+
     return {
-      totalVisits: 1420,
-      uniqueVisitors: 980,
+      totalVisits: visits,
+      uniqueVisitors: visits, // or tracked unique sessions
       totalVotes: totalVotes || 0
     };
   } catch (e) {
-    return { totalVisits: 1420, uniqueVisitors: 980, totalVotes: 0 };
+    console.error("Error fetching global stats:", e);
+    return { totalVisits: 1, uniqueVisitors: 1, totalVotes: 0 };
   }
 }
